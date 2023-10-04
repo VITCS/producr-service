@@ -1,0 +1,44 @@
+version = 0.1
+[dev2]
+[dev2.deploy]
+[dev2.deploy.parameters]
+stack_name = "spirits-dev2-product-priceAndAvailability"
+s3_bucket = "843219620739-spirits-dev-samdeploy"
+s3_prefix = "spirits-dev2-product-priceAndAvailability"
+region = "us-east-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+parameter_overrides = "Application=\"spirits\" Module=\"product\" Environment=\"dev2\" NodeLayerArn=\"/spirits/dev2/shared/nodelayer/arn\"  ElasticSearchDomain=\"/spirits/dev/elasticsearch/domain\" ElasticSearchDomainEndpoint=\"/spirits/dev/elasticsearch/domain/endpoint\""
+
+[dev]
+[dev.deploy]
+[dev.deploy.parameters]
+stack_name = "spirits-dev-product-priceAndAvailability"
+s3_bucket = "843219620739-spirits-dev-samdeploy"
+s3_prefix = "spirits-dev-product-priceAndAvailability"
+region = "us-east-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+parameter_overrides = "Application=\"spirits\" Module=\"product\" Environment=\"dev\" NodeLayerArn=\"/spirits/dev/shared/nodelayer/arn\" ElasticSearchDomain=\"/spirits/dev/elasticsearch/domain\"   ElasticSearchDomainEndpoint=\"/spirits/dev/elasticsearch/domain/endpoint\""
+
+[sit]
+[sit.deploy]
+[sit.deploy.parameters]
+stack_name = "spirits-sit-product-priceAndAvailability"
+s3_bucket = "843219620739-spirits-dev-samdeploy"
+s3_prefix = "spirits-sit-product-priceAndAvailability"
+region = "us-east-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+parameter_overrides = "Application=\"spirits\" Module=\"product\" Environment=\"sit\" NodeLayerArn=\"/spirits/sit/shared/nodelayer/arn\" ElasticSearchDomainEndpoint=\"/spirits/sit/elasticsearch/domain/endpoint\" ElasticSearchDomain=\"/spirits/sit/elasticsearch/domain\""
+
+[prd]
+[prd.deploy]
+[prd.deploy.parameters]
+stack_name = "spirits-prd-product-priceAndAvailability"
+s3_bucket = "409907184267-spirits-prd-samdeploy"
+s3_prefix = "spirits-prd-product-priceAndAvailability"
+region = "us-east-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+parameter_overrides = "Application=\"spirits\" Module=\"product\" Environment=\"prd\" NodeLayerArn=\"/spirits/prd/shared/nodelayer/arn\" ElasticSearchDomainEndpoint=\"/spirits/prd/elasticsearch/domain/endpoint\" ElasticSearchDomain=\"/spirits/prd/elasticsearch/domain\""

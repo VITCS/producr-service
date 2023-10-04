@@ -1,0 +1,66 @@
+version = 0.1
+[dev]
+[dev.deploy]
+[dev.deploy.parameters]
+stack_name = "spirits-dev-product-product"
+s3_bucket = "843219620739-spirits-dev-samdeploy"
+s3_prefix = "spirits-dev-product-product"
+region = "us-east-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+parameter_overrides = "Application=\"spirits\" Module=\"product\" Environment=\"dev\" NodeLayerArn=\"/spirits/dev/shared/nodelayer/arn\""
+
+[devDep]
+[devDep.deploy]
+[devDep.deploy.parameters]
+stack_name = "spirits-dev-product-product-dep"
+s3_bucket = "843219620739-spirits-dev-samdeploy"
+s3_prefix = "spirits-dev-product-product-dep"
+region = "us-east-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+parameter_overrides = "Application=\"spirits\" Module=\"product\" Environment=\"dev\" NodeLayerArn=\"/spirits/dev/shared/nodelayer/arn\""
+
+[sit]
+[sit.deploy]
+[sit.deploy.parameters]
+stack_name = "spirits-sit-product-product"
+s3_bucket = "843219620739-spirits-dev-samdeploy"
+s3_prefix = "spirits-sit-product-product"
+region = "us-east-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+parameter_overrides = "Application=\"spirits\" Module=\"product\" Environment=\"sit\" NodeLayerArn=\"/spirits/sit/shared/nodelayer/arn\""
+
+[sitDep]
+[sitDep.deploy]
+[sitDep.deploy.parameters]
+stack_name = "spirits-sit-product-product-dep"
+s3_bucket = "843219620739-spirits-dev-samdeploy"
+s3_prefix = "spirits-sit-product-product-dep"
+region = "us-east-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+parameter_overrides = "Application=\"spirits\" Module=\"product\" Environment=\"sit\" NodeLayerArn=\"/spirits/sit/shared/nodelayer/arn\""
+
+[prd]
+[prd.deploy]
+[prd.deploy.parameters]
+stack_name = "spirits-prd-product-product"
+s3_bucket = "409907184267-spirits-prd-samdeploy"
+s3_prefix = "spirits-prd-product-product"
+region = "us-east-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+parameter_overrides = "Application=\"spirits\" Module=\"product\" Environment=\"prd\" NodeLayerArn=\"/spirits/prd/shared/nodelayer/arn\""
+
+[prdDep]
+[prdDep.deploy]
+[prdDep.deploy.parameters]
+stack_name = "spirits-prd-product-product-dep"
+s3_bucket = "409907184267-spirits-prd-samdeploy"
+s3_prefix = "spirits-prd-product-product-dep"
+region = "us-east-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+parameter_overrides = "Application=\"spirits\" Module=\"product\" Environment=\"prd\" NodeLayerArn=\"/spirits/prd/shared/nodelayer/arn\""

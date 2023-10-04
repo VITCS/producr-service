@@ -1,0 +1,44 @@
+version = 0.1
+[dev]
+[dev.deploy]
+[dev.deploy.parameters]
+stack_name = "spirits-dev-product-productapi"
+s3_bucket = "843219620739-spirits-dev-samdeploy"
+s3_prefix = "spirits-dev-product-productapi"
+region = "us-east-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM CAPABILITY_AUTO_EXPAND CAPABILITY_NAMED_IAM"
+parameter_overrides = "Application=\"spirits\" Module=\"product\" Environment=\"dev\" SearchInstanceCount=\"1\" SearchInstanceType=\"t3.small.elasticsearch\" SearchEBSVolumeGB=\"10\" NodeLayerArn=\"/spirits/dev/shared/pythonlayer/arn\" MerchantpoolId=\"/spirits/dev/platform/merchantuserpool/id\""
+
+[dev2]
+[dev2.deploy]
+[dev2.deploy.parameters]
+stack_name = "spirits-dev2-product-productapi"
+s3_bucket = "843219620739-spirits-dev-samdeploy"
+s3_prefix = "spirits-dev2-product-productapi"
+region = "us-east-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM CAPABILITY_AUTO_EXPAND CAPABILITY_NAMED_IAM"
+parameter_overrides = "Application=\"spirits\" Module=\"product\" Environment=\"dev2\" LogLevel=\"INFO\" RetentionInDays=\"1\" NodeLayerArn=\"/spirits/dev2/shared/nodelayer/arn\" QueryLimit=\"20\" MerchantpoolId=\"/spirits/dev2/platform/merchantuserpool/id\""
+
+[sit]
+[sit.deploy]
+[sit.deploy.parameters]
+stack_name = "spirits-sit-product-productapi"
+s3_bucket = "843219620739-spirits-dev-samdeploy"
+s3_prefix = "spirits-sit-product-productapi"
+region = "us-east-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM CAPABILITY_AUTO_EXPAND CAPABILITY_NAMED_IAM"
+parameter_overrides = "Application=\"spirits\" Module=\"product\" Environment=\"sit\" SearchInstanceCount=\"1\" SearchInstanceType=\"t3.small.elasticsearch\" SearchEBSVolumeGB=\"10\" NodeLayerArn=\"/spirits/sit/shared/pythonlayer/arn\" MerchantpoolId=\"/spirits/sit/platform/merchantuserpool/id\""
+
+[prd]
+[prd.deploy]
+[prd.deploy.parameters]
+stack_name = "spirits-prd-product-productapi"
+s3_bucket = "409907184267-spirits-prd-samdeploy"
+s3_prefix = "spirits-prd-product-productapi"
+region = "us-east-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM CAPABILITY_AUTO_EXPAND CAPABILITY_NAMED_IAM"
+parameter_overrides = "Application=\"spirits\" Module=\"product\" Environment=\"prd\" SearchInstanceCount=\"1\" SearchInstanceType=\"t3.small.elasticsearch\" SearchEBSVolumeGB=\"10\" NodeLayerArn=\"/spirits/prd/shared/pythonlayer/arn\" MerchantpoolId=\"/spirits/prd/platform/merchantuserpool/id\""

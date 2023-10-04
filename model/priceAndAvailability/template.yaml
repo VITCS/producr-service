@@ -1,0 +1,308 @@
+################################################
+# Template for Tables - Price And Availablity
+################################################
+
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: "AWS::Serverless-2016-10-31"
+
+################################################
+# Parameters
+################################################
+Parameters:
+  Application:
+    Type: String
+  Module:
+    Type: String
+  Environment:
+    Type: String
+    Default: dev2
+    Description: Environment name
+  LogLevel:
+    Type: String
+    Default: INFO
+  RetentionInDays:
+    Type: Number
+    Default: 7
+    Description: CloudWatch Logs retention period for Lambda functions
+  NodeLayerArn:
+    Type: AWS::SSM::Parameter::Value<String>
+    Description: Node Layer NodeDependenciesLayer ARN
+  ElasticSearchDomain:
+    Type: AWS::SSM::Parameter::Value<String>
+    Description: Elasticsearch domain
+  ElasticSearchDomainEndpoint:
+    Type: AWS::SSM::Parameter::Value<String>
+    Description: Elasticsearch domain
+
+Globals:
+  Function:
+    Runtime: nodejs14.x
+    Handler: index.handler
+    Layers:
+      - !Ref NodeLayerArn
+    Timeout: 30
+    Tracing: Active
+    Environment:
+      Variables:
+        ENVIRONMENT: !Ref Environment
+        LOG_LEVEL: !Ref LogLevel
+
+Mappings:
+ RegionSuffix:
+    "us-east-1":
+      SFX1: ""
+    "us-west-2":
+      SFX1: "-us-west-2"
+
+################################################
+# Resources
+################################################
+Resources:
+
+  ################################################
+  # Functions
+  ################################################
+  ProdAvailabilityBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: 
+        !Sub
+          - "${Name}${Suffix}"
+          - Name: !Sub "${AWS::AccountId}-${Application}-${Environment}-merchantupdates"
+            Suffix: !FindInMap [RegionSuffix, !Ref "AWS::Region", SFX1]
+      CorsConfiguration:
+        CorsRules:
+        - AllowedHeaders:
+            - "*"
+          AllowedMethods:
+            - GET
+            - PUT
+            - HEAD
+          AllowedOrigins:
+            - "*"
+      NotificationConfiguration:
+        LambdaConfigurations:
+          - Event: s3:ObjectCreated:Put
+            Function: !GetAtt S3UploadProdAvailableTrigger.Arn
+      PublicAccessBlockConfiguration:
+            BlockPublicAcls : true
+            BlockPublicPolicy : true
+            IgnorePublicAcls : true
+            RestrictPublicBuckets : true
+
+  S3TriggerInvokePermission:
+    Type: AWS::Lambda::Permission
+    DependsOn: S3UploadProdAvailableTrigger
+    Properties:
+      FunctionName: !GetAtt S3UploadProdAvailableTrigger.Arn
+      Action: lambda:InvokeFunction
+      Principal: s3.amazonaws.com
+      SourceArn: 
+        !Sub 
+          - "arn:aws:s3:::${Name}${Suffix}"
+          - Name: !Sub "${AWS::AccountId}-${Application}-${Environment}-merchantupdates"
+            Suffix: !FindInMap [RegionSuffix, !Ref "AWS::Region", SFX1]
+
+  S3UploadProdAvailableTrigger:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub ${Application}-${Environment}-ProdAvailability-ElasticSearch-Function
+      Handler: processStorePnA.handler
+      CodeUri: ./src
+      MemorySize: 768
+      Tags:
+        Application: !Ref Application
+        Environment: !Ref Environment
+        Module: !Ref Module
+      Environment: 
+        Variables:
+          ES_REGION: !Sub ${AWS::Region}
+          ELASTICSEARCH_DOMAIN: !Ref ElasticSearchDomain
+          ES_INDEX_NAME: !Sub ${Application}-${Environment}-priceandavailability
+          BUCKET_NAME: 
+            !Sub
+              - "${Name}${Suffix}"
+              - Name: !Sub "${AWS::AccountId}-${Application}-${Environment}-merchantupdates"
+                Suffix: !FindInMap [RegionSuffix, !Ref "AWS::Region", SFX1]
+          LOG_LEVEL: !Ref LogLevel
+          ES_ENDPOINT: !Ref ElasticSearchDomainEndpoint
+          STORE_TABLE_NAME: !Sub ${Application}-${Environment}-Store
+        
+      Policies:
+      - arn:aws:iam::aws:policy/CloudWatchLambdaInsightsExecutionRolePolicy
+      - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole          
+      - S3CrudPolicy:
+          BucketName: 
+            !Sub
+              - "${Name}${Suffix}"
+              - Name: !Sub "${AWS::AccountId}-${Application}-${Environment}-merchantupdates"
+                Suffix: !FindInMap [RegionSuffix, !Ref "AWS::Region", SFX1]
+      - Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - es:*
+            Resource:
+              - !Sub arn:aws:es:${AWS::Region}:${AWS::AccountId}:domain/${Application}-${Environment}-es/*
+      - Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - dynamodb:BatchGetItem
+              - dynamodb:GetItem
+              - dynamodb:Scan
+              - dynamodb:Query
+            Resource:
+              - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${Application}-${Environment}-Store
+
+  S3SignedURLFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub ${Application}-${Environment}-ProdAvailability-S3SignedURL-Function
+      Handler: s3signedurl.handler
+      CodeUri: ./src
+      MemorySize: 768
+      Tags:
+        Application: !Ref Application
+        Environment: !Ref Environment
+        Module: !Ref Module
+      Environment: 
+        Variables:
+          Application: !Ref Application
+          BUCKET_NAME: 
+            !Sub
+              - "${Name}${Suffix}"
+              - Name: !Sub "${AWS::AccountId}-${Application}-${Environment}-merchantupdates"
+                Suffix: !FindInMap [RegionSuffix, !Ref "AWS::Region", SFX1]
+          LOG_LEVEL: !Ref LogLevel
+        
+      Policies:
+      - arn:aws:iam::aws:policy/CloudWatchLambdaInsightsExecutionRolePolicy
+      - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole          
+      - Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - "s3:PutObject"
+              - "s3:GetObject"
+            Resource: 
+              !Sub 
+                - "arn:aws:s3:::${Name}${Suffix}/*"
+                - Name: !Sub "${AWS::AccountId}-${Application}-${Environment}-merchantupdates"
+                  Suffix: !FindInMap [RegionSuffix, !Ref "AWS::Region", SFX1]
+       
+  S3SignedURLStoreLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${S3SignedURLFunction}"
+      RetentionInDays: !Ref RetentionInDays
+
+  GetSignedURLsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub ${Application}-${Environment}-ProdAvailability-GetSignedURLs-Function
+      Handler: getSignedURLs.handler
+      CodeUri: ./src
+      MemorySize: 768
+      Tags:
+        Application: !Ref Application
+        Environment: !Ref Environment
+        Module: !Ref Module
+      Environment: 
+        Variables:
+          Application: !Ref Application
+          Environment: !Ref Environment
+          BUCKET_NAME: 
+            !Sub
+              - "${Name}${Suffix}"
+              - Name: !Sub "${AWS::AccountId}-${Application}-${Environment}-merchantupdates"
+                Suffix: !FindInMap [RegionSuffix, !Ref "AWS::Region", SFX1]
+          LOG_LEVEL: !Ref LogLevel
+        
+      Policies:
+      - arn:aws:iam::aws:policy/CloudWatchLambdaInsightsExecutionRolePolicy
+      - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole          
+      - Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - "s3:PutObject"
+              - "s3:GetObject"
+            Resource: 
+              !Sub 
+                - "arn:aws:s3:::${Name}${Suffix}/*"
+                - Name: !Sub "${AWS::AccountId}-${Application}-${Environment}-merchantupdates"
+                  Suffix: !FindInMap [RegionSuffix, !Ref "AWS::Region", SFX1]
+        
+  GetSignedURLsLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${GetSignedURLsFunction}"
+      RetentionInDays: !Ref RetentionInDays
+  ################################################
+  # EventBridge Scheduler Rule for Sypram Schedule
+  ################################################
+  SypramScehduledFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub ${Application}-${Environment}-PnA-Sypram-ScheduleTrigger
+      Handler: syPramSchedule.handler
+      CodeUri: ./src
+      MemorySize: 1024
+      Tags:
+        Application: !Ref Application
+        Environment: !Ref Environment
+        Module: !Ref Module
+      Environment: 
+        Variables:
+          BUCKET_NAME: 
+            !Sub
+              - "${Name}${Suffix}"
+              - Name: !Sub "${AWS::AccountId}-${Application}-${Environment}-merchantupdates"
+                Suffix: !FindInMap [RegionSuffix, !Ref "AWS::Region", SFX1]
+          LOG_LEVEL: !Ref LogLevel
+          STORE_TABLE_NAME: !Sub ${Application}-${Environment}-Store
+          SYPRAM_PARM_BASE: !Sub '/${Application}/${Environment}/syprams'
+        
+      Policies:
+      - arn:aws:iam::aws:policy/CloudWatchLambdaInsightsExecutionRolePolicy
+      - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
+      - S3CrudPolicy:
+          BucketName: 
+            !Sub
+              - "${Name}${Suffix}"
+              - Name: !Sub "${AWS::AccountId}-${Application}-${Environment}-merchantupdates"
+                Suffix: !FindInMap [RegionSuffix, !Ref "AWS::Region", SFX1]
+      - Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - dynamodb:BatchGetItem
+              - dynamodb:GetItem
+              - dynamodb:Scan
+              - dynamodb:Query
+            Resource:
+              - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${Application}-${Environment}-Store
+      - Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - ssm:GetParameter
+              - ssm:GetParameters
+              - ssm:GetParametersByPath
+            Resource:
+              - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${Application}-${Environment}-Store
+              - !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${Application}/${Environment}/syprams/*
+      Events:
+        SypramSchedule:
+          Type: Schedule
+          Properties:
+            Schedule: 'rate(4 hours)'
+            Name: !Sub ${Application}-${Environment}-SypramSchedule
+            Description: Process Sypram File Schedule
+            Enabled: true
+            Input: '{"stores":[{"storeId":"0386566890806019"},{"storeId":"2022093318307332"}]}'
+            DeadLetterConfig:
+              Type: SQS
+              QueueLogicalId: SypramDLQ
+

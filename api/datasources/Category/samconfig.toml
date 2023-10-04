@@ -1,0 +1,45 @@
+version = 0.1
+
+[dev]
+[dev.deploy]
+[dev.deploy.parameters]
+stack_name = "spirits-dev-category-datasource"
+s3_bucket = "843219620739-spirits-dev-samdeploy"
+s3_prefix = "spirits-dev-category-datasource"
+region = "us-east-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM CAPABILITY_AUTO_EXPAND"
+parameter_overrides = "Application=\"spirits\" Module=\"product\" Environment=\"dev\" LogLevel=\"INFO\" RetentionInDays=\"30\" NodeLayerArn=\"/spirits/dev/shared/nodelayer/arn\" QueryLimit=\"20\" ApiId=\"/spirits/dev/product/productApi/id\" SearchItem=\"spirits-dev-Category\""
+
+[dev2]
+[dev2.deploy]
+[dev2.deploy.parameters]
+stack_name = "spirits-dev2-category-datasource"
+s3_bucket = "843219620739-spirits-dev-samdeploy"
+s3_prefix = "spirits-dev2-category-datasource"
+region = "us-east-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM CAPABILITY_AUTO_EXPAND"
+parameter_overrides = "Application=\"spirits\" Module=\"product\" Environment=\"dev2\" LogLevel=\"INFO\" RetentionInDays=\"30\" NodeLayerArn=\"/spirits/dev2/shared/nodelayer/arn\" QueryLimit=\"20\" ApiId=\"/spirits/dev2/product/productApi/id\" SearchItem=\"spirits-dev2-Category\""
+
+[sit]
+[sit.deploy]
+[sit.deploy.parameters]
+stack_name = "spirits-sit-category-datasource"
+s3_bucket = "843219620739-spirits-dev-samdeploy"
+s3_prefix = "spirits-sit-category-datasource"
+region = "us-east-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM CAPABILITY_AUTO_EXPAND"
+parameter_overrides = "Application=\"spirits\" Module=\"product\" Environment=\"sit\" LogLevel=\"INFO\" RetentionInDays=\"30\" NodeLayerArn=\"/spirits/sit/shared/nodelayer/arn\" QueryLimit=\"20\" ApiId=\"/spirits/sit/product/productApi/id\" SearchItem=\"spirits-sit-Category\""
+
+[prd]
+[prd.deploy]
+[prd.deploy.parameters]
+stack_name = "spirits-prd-category-datasource"
+s3_bucket = "409907184267-spirits-prd-samdeploy"
+s3_prefix = "spirits-prd-category-datasource"
+region = "us-east-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM CAPABILITY_AUTO_EXPAND"
+parameter_overrides = "Application=\"spirits\" Module=\"product\" Environment=\"prd\" LogLevel=\"INFO\" RetentionInDays=\"30\" NodeLayerArn=\"/spirits/prd/shared/nodelayer/arn\" QueryLimit=\"20\" ApiId=\"/spirits/prd/product/productApi/id\" SearchItem=\"spirits-prd-Category\""

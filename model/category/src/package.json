@@ -1,0 +1,10 @@
+{
+  "name": "category-lambda",
+  "version": "1.0.0",
+  "description": "Lambda Functions for Category Management",
+  "main": "index.js",
+  "license": "Apache-2.0",
+  "dependencies": {
+
+  }
+}

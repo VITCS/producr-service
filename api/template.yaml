@@ -1,0 +1,159 @@
+################################################
+# Template for merchant-api with AppSync
+################################################
+
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: 'AWS::Serverless-2016-10-31'
+
+################################################
+# Parameters
+################################################
+Parameters:
+  Application:
+    Type: String
+  Module:
+    Type: String
+  Environment:
+    Type: String
+    Default: dev2
+    Description: Environment name
+  LogLevel:
+    Type: String
+    Default: INFO
+  RetentionInDays:
+    Type: Number
+    Default: 1
+    Description: CloudWatch Logs retention period for Lambda functions
+  NodeLayerArn:
+    Type: AWS::SSM::Parameter::Value<String>
+    Description: Node Layer NodeDependenciesLayer ARN
+  QueryLimit:
+    Type: Number
+    Default: 20
+    Description: Maximum number of items to return from a single query
+  MerchantpoolId:
+    Type: AWS::SSM::Parameter::Value<String>
+    Description: Merchant userpool id
+################################################
+# Globals
+################################################    
+Globals:
+  Function:
+    Runtime: nodejs14.x
+    Handler: index.handler
+    Layers:
+      - !Ref NodeLayerArn 
+    Timeout: 30
+    Tracing: Active
+    Environment:
+      Variables:
+        ENVIRONMENT: !Ref Environment
+        EVENT_BUS_NAME: !Ref EventBusName
+        POWERTOOLS_SERVICE_NAME: users
+        POWERTOOLS_TRACE_DISABLED: "false"
+        LOG_LEVEL: !Ref LogLevel
+################################################
+# Resources
+################################################
+Resources:
+  ##################################
+  # GRAPHQL API                    #
+  ##################################
+  ProductApi:
+    Type: AWS::AppSync::GraphQLApi
+    Properties:
+      Name: !Sub ${Application}-${Environment}-${Module}-productapi
+      AuthenticationType: AMAZON_COGNITO_USER_POOLS
+      UserPoolConfig: 
+        # AppIdClientRegex: !Sub "ecommerce-${Environment}-frontend-api.*"
+        AwsRegion: !Ref AWS::Region
+        # UserPoolId: !Sub '{{resolve:ssm:/${Application}/${Environment}/platform/merchantuserpool/id}}'
+        UserPoolId: !Ref MerchantpoolId
+        DefaultAction: ALLOW
+      AdditionalAuthenticationProviders:
+        - AuthenticationType: API_KEY
+   
+      LogConfig:
+        CloudWatchLogsRoleArn: !GetAtt ApiLoggingRole.Arn
+        FieldLogLevel: ALL
+      XrayEnabled: true
+
+  ProductApiClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: !Sub ${Application}-${Environment}-${Module}-productapi-client
+      UserPoolId: !Ref MerchantpoolId
+      AllowedOAuthFlowsUserPoolClient: true
+      CallbackURLs:
+        - http://localhost:3000
+        - https://oauth.pstmn.io/v1/callback
+      GenerateSecret: false
+      AllowedOAuthFlows:
+        - code
+        - implicit
+      AllowedOAuthScopes:
+        - phone
+        - email
+        - openid
+        - profile
+      SupportedIdentityProviders:
+        - COGNITO
+      RefreshTokenValidity: 30
+
+      
+  ApiLoggingRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: appsync.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: CloudWatchLogsAccess
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: "*"
+
+  ApiLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/appsync/apis/${ProductApi.ApiId}"
+      RetentionInDays: !Ref RetentionInDays
+
+  ApiArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${Application}/${Environment}/${Module}/productApi/arn
+      Type: String
+      Value: !GetAtt ProductApi.Arn
+
+  ApiIdParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${Application}/${Environment}/${Module}/productApi/id
+      Type: String
+      Value: !GetAtt ProductApi.ApiId
+
+  ApiUrlParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${Application}/${Environment}/${Module}/productApi/url
+      Type: String
+      Value: !GetAtt ProductApi.GraphQLUrl
+
+  Schema:
+    Type: AWS::AppSync::GraphQLSchema
+    Properties:
+      ApiId: !GetAtt ProductApi.ApiId
+      DefinitionS3Location: "resources/schema.graphql"
+
+
+        

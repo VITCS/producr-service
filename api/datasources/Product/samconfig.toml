@@ -1,0 +1,45 @@
+version = 0.1
+
+[dev]
+[dev.deploy]
+[dev.deploy.parameters]
+stack_name = "spirits-dev-product-datasource"
+s3_bucket = "843219620739-spirits-dev-samdeploy"
+s3_prefix = "spirits-dev-product-datasource"
+region = "us-east-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM CAPABILITY_AUTO_EXPAND"
+parameter_overrides = "Application=\"spirits\" Module=\"product\" Environment=\"dev\" LogLevel=\"INFO\" RetentionInDays=\"30\" NodeLayerArn=\"/spirits/dev/shared/nodelayer/arn\" QueryLimit=\"20\" ApiId=\"/spirits/dev/product/productApi/id\" SearchItem=\"spirits-dev-Product\""
+
+[dev2]
+[dev2.deploy]
+[dev2.deploy.parameters]
+stack_name = "spirits-dev2-product-datasource"
+s3_bucket = "843219620739-spirits-dev-samdeploy"
+s3_prefix = "spirits-dev2-product-datasource"
+region = "us-east-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM CAPABILITY_AUTO_EXPAND"
+parameter_overrides = "Application=\"spirits\" Module=\"product\" Environment=\"dev2\" LogLevel=\"INFO\" RetentionInDays=\"30\" NodeLayerArn=\"/spirits/dev2/shared/nodelayer/arn\" QueryLimit=\"20\" ApiId=\"/spirits/dev2/product/productApi/id\" SearchItem=\"spirits-dev2-Product\""
+
+[sit]
+[sit.deploy]
+[sit.deploy.parameters]
+stack_name = "spirits-sit-product-datasource"
+s3_bucket = "843219620739-spirits-dev-samdeploy"
+s3_prefix = "spirits-sit-product-datasource"
+region = "us-east-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM CAPABILITY_AUTO_EXPAND"
+parameter_overrides = "Application=\"spirits\" Module=\"product\" Environment=\"sit\" LogLevel=\"INFO\" RetentionInDays=\"30\" NodeLayerArn=\"/spirits/sit/shared/nodelayer/arn\" QueryLimit=\"20\" ApiId=\"/spirits/sit/product/productApi/id\" SearchItem=\"spirits-sit-Product\""
+
+[prd]
+[prd.deploy]
+[prd.deploy.parameters]
+stack_name = "spirits-prd-product-datasource"
+s3_bucket = "409907184267-spirits-prd-samdeploy"
+s3_prefix = "spirits-prd-product-datasource"
+region = "us-east-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM CAPABILITY_AUTO_EXPAND"
+parameter_overrides = "Application=\"spirits\" Module=\"product\" Environment=\"prd\" LogLevel=\"INFO\" RetentionInDays=\"30\" NodeLayerArn=\"/spirits/prd/shared/nodelayer/arn\" QueryLimit=\"20\" ApiId=\"/spirits/prd/product/productApi/id\" SearchItem=\"spirits-prd-Product\""

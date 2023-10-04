@@ -1,0 +1,77 @@
+"""
+Product Master Database
+"""
+type Product
+  @model
+  @aws_api_key
+  @aws_cognito_user_pools
+  @searchable
+  @key(fields: ["id"]) {
+  #  Product Id Internal to the Platform
+  id: ID!
+  #  Product Name  Displayed on the screen.
+  prodName: String!
+  prodFullName: String!
+
+  # Short Description.  Displayed on small screens like Mobile devices.
+  prodShortDesc: String!
+
+  # Long Description.  Displayed on Large Screens as product Description.
+  prodLongDesc: String!
+
+  # Product Category, Major and Minor.  These are categorization of the product.
+  prodCategory: String!
+  prodMajor: String!
+  prodMinor: String!
+  prodCategoryRef: String!
+
+  # UPC.  Primary
+  upc: String
+  # Additional UPC Codes if Any
+  otherUPC: [String]
+
+  manufacturer: String
+  brandLine: String
+  size: String
+  uom: String
+  container: String
+  otherUOM: [ID]
+  imageFile: String
+  images: [String]
+  tags: [String]
+
+  country: String
+  region: String
+  winery: String
+  vintageKey: String
+  Vintage: String
+
+  abv: String
+  sweetness: String
+  flavour: String
+}
+
+type PriceAndAvailabilty
+  @model
+  @aws_cognito_user_pools
+  @aws_api_key
+  @searchable {
+  id: ID!
+  prodId: ID!
+  storeId: ID!
+  price: Float
+  splPrice: Float
+  splPriceEndDate: AWSDateTime
+  avlQuantity: Float
+  priceUpdatedTime: AWSDateTime
+  isAvailableForOnline: Boolean
+}
+
+type Category @model @aws_cognito_user_pools @aws_api_key @searchable {
+  id: ID!
+  type: CategoryType
+  catgName: String!
+  description: String!
+  parentId: ID!
+  sdtAttr: [String]
+}

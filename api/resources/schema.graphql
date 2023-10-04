@@ -1,0 +1,629 @@
+"""
+Product Master Database
+"""
+type Product @aws_api_key @aws_cognito_user_pools {
+  id: ID!
+  prodName: String!
+  prodFullName: String!
+  prodShortDesc: String!
+  prodLongDesc: String!
+  prodCategory: String!
+  prodMajor: String!
+  prodMinor: String!
+  prodCategoryRef: String!
+  upc: String
+  otherUPC: [String]
+  manufacturer: String
+  brandLine: String
+  size: String
+  uom: String
+  container: String
+  otherUOM: [ID]
+  imageFile: String
+  images: [String]
+  tags: [String]
+  country: String
+  region: String
+  winery: String
+  vintageKey: String
+  Vintage: String
+  abv: String
+  sweetness: String
+  flavour: String
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+type PriceAndAvailability @aws_cognito_user_pools @aws_api_key {
+  id: ID!
+  prodId: ID!
+  storeId: ID!
+  price: Float
+  splPrice: Float
+  splPriceEndDate: AWSDateTime
+  avlQuantity: Float
+  priceUpdatedTime: AWSDateTime
+  isAvailableForOnline: Boolean
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+type Category @aws_cognito_user_pools @aws_api_key {
+  id: ID!
+  type: CategoryType
+  catgName: String!
+  description: String!
+  parentId: ID!
+  sdtAttr: [String]
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+enum CategoryType {
+  Major
+  Minor
+}
+
+enum ModelSortDirection {
+  ASC
+  DESC
+}
+
+type ModelProductConnection {
+  items: [Product]
+  nextToken: String
+}
+
+input ModelStringFilterInput {
+  ne: String
+  eq: String
+  le: String
+  lt: String
+  ge: String
+  gt: String
+  contains: String
+  notContains: String
+  between: [String]
+  beginsWith: String
+}
+
+input ModelIDFilterInput {
+  ne: ID
+  eq: ID
+  le: ID
+  lt: ID
+  ge: ID
+  gt: ID
+  contains: ID
+  notContains: ID
+  between: [ID]
+  beginsWith: ID
+}
+
+input ModelIntFilterInput {
+  ne: Int
+  eq: Int
+  le: Int
+  lt: Int
+  ge: Int
+  gt: Int
+  between: [Int]
+}
+
+input ModelFloatFilterInput {
+  ne: Float
+  eq: Float
+  le: Float
+  lt: Float
+  ge: Float
+  gt: Float
+  between: [Float]
+}
+
+input ModelBooleanFilterInput {
+  ne: Boolean
+  eq: Boolean
+}
+
+input ModelProductFilterInput {
+  id: ModelIDFilterInput
+  prodName: ModelStringFilterInput
+  prodFullName: ModelStringFilterInput
+  prodShortDesc: ModelStringFilterInput
+  prodLongDesc: ModelStringFilterInput
+  prodCategory: ModelStringFilterInput
+  prodMajor: ModelStringFilterInput
+  prodMinor: ModelStringFilterInput
+  prodCategoryRef: ModelStringFilterInput
+  upc: ModelStringFilterInput
+  otherUPC: ModelStringFilterInput
+  manufacturer: ModelStringFilterInput
+  brandLine: ModelStringFilterInput
+  size: ModelStringFilterInput
+  uom: ModelStringFilterInput
+  container: ModelStringFilterInput
+  otherUOM: ModelIDFilterInput
+  imageFile: ModelStringFilterInput
+  images: ModelStringFilterInput
+  tags: ModelStringFilterInput
+  country: ModelStringFilterInput
+  region: ModelStringFilterInput
+  winery: ModelStringFilterInput
+  vintageKey: ModelStringFilterInput
+  Vintage: ModelStringFilterInput
+  abv: ModelStringFilterInput
+  sweetness: ModelStringFilterInput
+  flavour: ModelStringFilterInput
+  and: [ModelProductFilterInput]
+  or: [ModelProductFilterInput]
+  not: ModelProductFilterInput
+}
+
+type Query {
+  getProduct(id: ID!): Product
+  listProducts(
+    id: ID
+    filter: ModelProductFilterInput
+    limit: Int
+    nextToken: String
+    sortDirection: ModelSortDirection
+  ): ModelProductConnection
+  getPriceAndAvailability(id: ID!): PriceAndAvailability
+  listPriceAndAvailabilitys(
+    filter: ModelPriceAndAvailabilityFilterInput
+    limit: Int
+    nextToken: String
+  ): ModelPriceAndAvailabilityConnection
+  getCategory(id: ID!): Category
+  listCategorys(
+    filter: ModelCategoryFilterInput
+    limit: Int
+    nextToken: String
+  ): ModelCategoryConnection
+  searchProducts(
+    filter: SearchableProductFilterInput
+    sort: SearchableProductSortInput
+    limit: Int
+    nextToken: String
+    from: Int
+  ): SearchableProductConnection
+  searchPriceAndAvailabilitys(
+    filter: SearchablePriceAndAvailabilityFilterInput
+    sort: SearchablePriceAndAvailabilitySortInput
+    limit: Int
+    nextToken: String
+    from: Int
+  ): SearchablePriceAndAvailabilityConnection
+  searchCategorys(
+    filter: SearchableCategoryFilterInput
+    sort: SearchableCategorySortInput
+    limit: Int
+    nextToken: String
+    from: Int
+  ): SearchableCategoryConnection
+  getS3SignedURL(
+		merchantAccountId: String!,
+		storeID: String,
+		fileName: String!,
+		requestType: String!,
+		contentType: String!
+	): s3signedURL
+	getMultipleSignedURL(
+		merchantAccountId: String!,
+		storeID: String,
+		requestType: String!,
+		filesList: [S3FileType]
+	): urlList
+}
+
+input S3FileType {
+	fileName: String!
+	contentType: String!
+}
+input CreateProductInput {
+  id: ID
+  prodName: String!
+  prodFullName: String!
+  prodShortDesc: String!
+  prodLongDesc: String!
+  prodCategory: String!
+  prodMajor: String!
+  prodMinor: String!
+  prodCategoryRef: String!
+  upc: String
+  otherUPC: [String]
+  manufacturer: String
+  brandLine: String
+  size: String
+  uom: String
+  container: String
+  otherUOM: [ID]
+  imageFile: String
+  images: [String]
+  tags: [String]
+  country: String
+  region: String
+  winery: String
+  vintageKey: String
+  Vintage: String
+  abv: String
+  sweetness: String
+  flavour: String
+}
+
+input UpdateProductInput {
+  id: ID!
+  prodName: String
+  prodFullName: String
+  prodShortDesc: String
+  prodLongDesc: String
+  prodCategory: String
+  prodMajor: String
+  prodMinor: String
+  prodCategoryRef: String
+  upc: String
+  otherUPC: [String]
+  manufacturer: String
+  brandLine: String
+  size: String
+  uom: String
+  container: String
+  otherUOM: [ID]
+  imageFile: String
+  images: [String]
+  tags: [String]
+  country: String
+  region: String
+  winery: String
+  vintageKey: String
+  Vintage: String
+  abv: String
+  sweetness: String
+  flavour: String
+}
+
+input DeleteProductInput {
+  id: ID!
+}
+
+type Mutation {
+  createProduct(input: CreateProductInput!): Product
+  updateProduct(input: UpdateProductInput!): Product
+  deleteProduct(input: DeleteProductInput!): Product
+  createPriceAndAvailability(
+    input: CreatePriceAndAvailabilityInput!
+  ): PriceAndAvailability
+  updatePriceAndAvailability(
+    input: UpdatePriceAndAvailabilityInput!
+  ): PriceAndAvailability
+  deletePriceAndAvailability(
+    input: DeletePriceAndAvailabilityInput!
+  ): PriceAndAvailability
+  createCategory(input: CreateCategoryInput!): Category
+  updateCategory(input: UpdateCategoryInput!): Category
+  deleteCategory(input: DeleteCategoryInput!): Category
+}
+
+type Subscription {
+  onCreateProduct: Product @aws_subscribe(mutations: ["createProduct"])
+  onUpdateProduct: Product @aws_subscribe(mutations: ["updateProduct"])
+  onDeleteProduct: Product @aws_subscribe(mutations: ["deleteProduct"])
+  onCreatePriceAndAvailability: PriceAndAvailability
+    @aws_subscribe(mutations: ["createPriceAndAvailability"])
+  onUpdatePriceAndAvailability: PriceAndAvailability
+    @aws_subscribe(mutations: ["updatePriceAndAvailability"])
+  onDeletePriceAndAvailability: PriceAndAvailability
+    @aws_subscribe(mutations: ["deletePriceAndAvailability"])
+  onCreateCategory: Category @aws_subscribe(mutations: ["createCategory"])
+  onUpdateCategory: Category @aws_subscribe(mutations: ["updateCategory"])
+  onDeleteCategory: Category @aws_subscribe(mutations: ["deleteCategory"])
+}
+
+type ModelPriceAndAvailabilityConnection {
+  items: [PriceAndAvailability]
+  nextToken: String
+}
+
+type s3signedURL {
+	signedURL: String
+	fileName: String
+}
+
+type urlList {
+	items: [s3signedURL]
+}
+
+input ModelPriceAndAvailabilityFilterInput {
+  id: ModelIDFilterInput
+  prodId: ModelIDFilterInput
+  storeId: ModelIDFilterInput
+  price: ModelFloatFilterInput
+  splPrice: ModelFloatFilterInput
+  splPriceEndDate: ModelStringFilterInput
+  avlQuantity: ModelFloatFilterInput
+  priceUpdatedTime: ModelStringFilterInput
+  isAvailableForOnline: ModelBooleanFilterInput
+  and: [ModelPriceAndAvailabilityFilterInput]
+  or: [ModelPriceAndAvailabilityFilterInput]
+  not: ModelPriceAndAvailabilityFilterInput
+}
+
+input CreatePriceAndAvailabilityInput {
+  id: ID
+  prodId: ID!
+  storeId: ID!
+  price: Float
+  splPrice: Float
+  splPriceEndDate: AWSDateTime
+  avlQuantity: Float
+  priceUpdatedTime: AWSDateTime
+  isAvailableForOnline: Boolean
+}
+
+input UpdatePriceAndAvailabilityInput {
+  id: ID!
+  prodId: ID
+  storeId: ID
+  price: Float
+  splPrice: Float
+  splPriceEndDate: AWSDateTime
+  avlQuantity: Float
+  priceUpdatedTime: AWSDateTime
+  isAvailableForOnline: Boolean
+}
+
+input DeletePriceAndAvailabilityInput {
+  id: ID!
+}
+
+type ModelCategoryConnection {
+  items: [Category]
+  nextToken: String
+}
+
+input ModelCategoryTypeFilterInput {
+  eq: CategoryType
+  ne: CategoryType
+}
+
+input ModelCategoryFilterInput {
+  id: ModelIDFilterInput
+  type: ModelCategoryTypeFilterInput
+  catgName: ModelStringFilterInput
+  description: ModelStringFilterInput
+  parentId: ModelIDFilterInput
+  sdtAttr: ModelStringFilterInput
+  and: [ModelCategoryFilterInput]
+  or: [ModelCategoryFilterInput]
+  not: ModelCategoryFilterInput
+}
+
+input CreateCategoryInput {
+  id: ID
+  type: CategoryType
+  catgName: String!
+  description: String!
+  parentId: ID!
+  sdtAttr: [String]
+}
+
+input UpdateCategoryInput {
+  id: ID!
+  type: CategoryType
+  catgName: String
+  description: String
+  parentId: ID
+  sdtAttr: [String]
+}
+
+input DeleteCategoryInput {
+  id: ID!
+}
+
+input SearchableStringFilterInput {
+  ne: String
+  gt: String
+  lt: String
+  gte: String
+  lte: String
+  eq: String
+  match: String
+  matchPhrase: String
+  matchPhrasePrefix: String
+  multiMatch: String
+  exists: Boolean
+  wildcard: String
+  regexp: String
+  range: [String]
+}
+
+input SearchableIntFilterInput {
+  ne: Int
+  gt: Int
+  lt: Int
+  gte: Int
+  lte: Int
+  eq: Int
+  range: [Int]
+}
+
+input SearchableFloatFilterInput {
+  ne: Float
+  gt: Float
+  lt: Float
+  gte: Float
+  lte: Float
+  eq: Float
+  range: [Float]
+}
+
+input SearchableBooleanFilterInput {
+  eq: Boolean
+  ne: Boolean
+}
+
+input SearchableIDFilterInput {
+  ne: ID
+  gt: ID
+  lt: ID
+  gte: ID
+  lte: ID
+  eq: ID
+  match: ID
+  matchPhrase: ID
+  matchPhrasePrefix: ID
+  multiMatch: ID
+  exists: Boolean
+  wildcard: ID
+  regexp: ID
+  range: [ID]
+}
+
+input SearchableProductFilterInput {
+  id: SearchableIDFilterInput
+  prodName: SearchableStringFilterInput
+  prodFullName: SearchableStringFilterInput
+  prodShortDesc: SearchableStringFilterInput
+  prodLongDesc: SearchableStringFilterInput
+  prodCategory: SearchableStringFilterInput
+  prodMajor: SearchableStringFilterInput
+  prodMinor: SearchableStringFilterInput
+  prodCategoryRef: SearchableStringFilterInput
+  upc: SearchableStringFilterInput
+  otherUPC: SearchableStringFilterInput
+  manufacturer: SearchableStringFilterInput
+  brandLine: SearchableStringFilterInput
+  size: SearchableStringFilterInput
+  uom: SearchableStringFilterInput
+  container: SearchableStringFilterInput
+  otherUOM: SearchableIDFilterInput
+  imageFile: SearchableStringFilterInput
+  images: SearchableStringFilterInput
+  tags: SearchableStringFilterInput
+  country: SearchableStringFilterInput
+  region: SearchableStringFilterInput
+  winery: SearchableStringFilterInput
+  vintageKey: SearchableStringFilterInput
+  Vintage: SearchableStringFilterInput
+  abv: SearchableStringFilterInput
+  sweetness: SearchableStringFilterInput
+  flavour: SearchableStringFilterInput
+  and: [SearchableProductFilterInput]
+  or: [SearchableProductFilterInput]
+  not: SearchableProductFilterInput
+}
+
+enum SearchableSortDirection {
+  asc
+  desc
+}
+
+enum SearchableProductSortableFields {
+  id
+  prodName
+  prodFullName
+  prodShortDesc
+  prodLongDesc
+  prodCategory
+  prodMajor
+  prodMinor
+  prodCategoryRef
+  upc
+  otherUPC
+  manufacturer
+  brandLine
+  size
+  uom
+  container
+  otherUOM
+  imageFile
+  images
+  tags
+  country
+  region
+  winery
+  vintageKey
+  Vintage
+  abv
+  sweetness
+  flavour
+}
+
+input SearchableProductSortInput {
+  field: SearchableProductSortableFields
+  direction: SearchableSortDirection
+}
+
+type SearchableProductConnection {
+  items: [Product]
+  nextToken: String
+  total: Int
+}
+
+input SearchablePriceAndAvailabilityFilterInput {
+  id: SearchableIDFilterInput
+  prodId: SearchableIDFilterInput
+  storeId: SearchableIDFilterInput
+  price: SearchableFloatFilterInput
+  splPrice: SearchableFloatFilterInput
+  splPriceEndDate: SearchableStringFilterInput
+  avlQuantity: SearchableFloatFilterInput
+  priceUpdatedTime: SearchableStringFilterInput
+  isAvailableForOnline: SearchableBooleanFilterInput
+  and: [SearchablePriceAndAvailabilityFilterInput]
+  or: [SearchablePriceAndAvailabilityFilterInput]
+  not: SearchablePriceAndAvailabilityFilterInput
+}
+
+enum SearchablePriceAndAvailabilitySortableFields {
+  id
+  prodId
+  storeId
+  price
+  splPrice
+  splPriceEndDate
+  avlQuantity
+  priceUpdatedTime
+  isAvailableForOnline
+}
+
+input SearchablePriceAndAvailabilitySortInput {
+  field: SearchablePriceAndAvailabilitySortableFields
+  direction: SearchableSortDirection
+}
+
+type SearchablePriceAndAvailabilityConnection {
+  items: [PriceAndAvailability]
+  nextToken: String
+  total: Int
+}
+
+input SearchableCategoryFilterInput {
+  id: SearchableIDFilterInput
+  catgName: SearchableStringFilterInput
+  description: SearchableStringFilterInput
+  parentId: SearchableIDFilterInput
+  sdtAttr: SearchableStringFilterInput
+  and: [SearchableCategoryFilterInput]
+  or: [SearchableCategoryFilterInput]
+  not: SearchableCategoryFilterInput
+}
+
+enum SearchableCategorySortableFields {
+  id
+  catgName
+  description
+  parentId
+  sdtAttr
+}
+
+input SearchableCategorySortInput {
+  field: SearchableCategorySortableFields
+  direction: SearchableSortDirection
+}
+
+type SearchableCategoryConnection {
+  items: [Category]
+  nextToken: String
+  total: Int
+}

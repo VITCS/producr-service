@@ -1,0 +1,509 @@
+################################################
+# Parameters
+################################################
+Parameters:
+  Application:
+    Type: String
+  Module:
+    Type: String
+  Environment:
+    Type: String
+    Default: dev2
+    Description: Environment name
+  LogLevel:
+    Type: String
+    Default: INFO
+  RetentionInDays:
+    Type: Number
+    Default: 1
+    Description: CloudWatch Logs retention period for Lambda functions
+  NodeLayerArn:
+    Type: AWS::SSM::Parameter::Value<String>
+    Description: Node Layer NodeDependenciesLayer ARN
+  QueryLimit:
+    Type: Number
+    Default: 20
+    Description: Maximum number of items to return from a single query
+  ApiId:
+    Type: AWS::SSM::Parameter::Value<String>
+    Description: API Id
+  SearchItem:
+    Type: String
+    Description: Search Item i.e. Table to search
+    Default: ${Appplication}-${Environment}-Product
+##############################################################
+# Data Sources for Product
+##############################################################
+Resources:
+  ##########################
+  # Roles #
+  ##########################
+  ManageProductFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: appsync.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: ManageProductFunctionAccess
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: lambda:InvokeFunction
+                Resource: !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${Application}-${Environment}-ManageProduct-Function
+
+  ##########################
+  # Manage Product #
+  ##########################
+  ManageProductDataSource:
+    Type: AWS::AppSync::DataSource
+    Properties:
+      ApiId: !Ref ApiId
+      Name: ManageProduct
+      Type: AWS_LAMBDA
+      ServiceRoleArn: !GetAtt ManageProductFunctionRole.Arn
+      LambdaConfig:
+        LambdaFunctionArn: !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${Application}-${Environment}-ManageProduct-Function
+
+  CreateProductResolver:
+    Type: AWS::AppSync::Resolver
+    Properties:
+      ApiId: !Ref ApiId
+      DataSourceName: !GetAtt ManageProductDataSource.Name
+      FieldName: createProduct
+      TypeName: Mutation
+      RequestMappingTemplate: |
+        #if($context.identity.claims.containsKey("m_account"))
+          #set($accountId = $context.identity.claims.get("m_account"))
+        #else
+          #set($accountId = "NONE")
+        #end
+        #if($context.identity.claims.containsKey("m_group"))
+          #set($group = $context.identity.claims.get("m_group"))
+        #else
+          #set($group = "NONE")
+        #end
+        #if($accountId == $context.arguments.input.merchantAccountId &&  $group == "M_ADMIN")
+        ##
+        {
+          "version": "2018-05-29",
+            "operation": "Invoke",
+            "payload": {
+            "field": "createProduct",
+            "identity": $context.identity,
+            "body": $util.toJson($context.arguments)
+          }
+        }
+        #else
+            $utils.unauthorized()
+        #end
+      ResponseMappingTemplate: |
+        $utils.toJson($ctx.result)
+
+  UpdateProductResolver:
+    Type: AWS::AppSync::Resolver
+    Properties:
+      ApiId: !Ref ApiId
+      DataSourceName: !GetAtt ManageProductDataSource.Name
+      FieldName: updateProduct
+      TypeName: Mutation
+      RequestMappingTemplate: |
+        #if($context.identity.claims.containsKey("m_group"))
+          #set($group = $context.identity.claims.get("m_group"))
+        #else
+          #set($group = "NONE")
+        #end
+        #if($context.identity.claims.containsKey("m_stores"))
+          #set($stores = $context.identity.claims.get("m_stores").split(","))
+        #else
+          #set($stores = "NONE")
+        #end
+        #if( ($stores.contains($context.arguments.input.id) &&  $group == "M_MANAGER" )|| $group == "M_ADMIN")
+        ##
+        {
+          "version": "2018-05-29",
+            "operation": "Invoke",
+            "payload": {
+            "field": "updateProduct",
+            "identity": $context.identity,
+            "body": $util.toJson($context.arguments)
+          }
+        }
+        #else
+            $utils.unauthorized()
+        #end
+      ResponseMappingTemplate: |
+        $utils.toJson($ctx.result)
+
+  DeleteProductResolver:
+    Type: AWS::AppSync::Resolver
+    Properties:
+      ApiId: !Ref ApiId
+      DataSourceName: !GetAtt ManageProductDataSource.Name
+      FieldName: deleteProduct
+      TypeName: Mutation
+      RequestMappingTemplate: |
+        #if($context.identity.claims.containsKey("m_group"))
+          #set($group = $context.identity.claims.get("m_group"))
+        #else
+          #set($group = "NONE")
+        #end
+        #if( $group == "M_ADMIN")
+        ##
+        {
+          "version": "2018-05-29",
+            "operation": "Invoke",
+            "payload": {
+            "field": "deleteProduct",
+            "identity": $util.toJson($context.identity),
+            "body": $util.toJson($context.arguments)
+          }
+        }
+        #else
+            $utils.unauthorized()
+        #end
+      ResponseMappingTemplate: |
+        $utils.toJson($ctx.result)
+
+  ########################
+  # Get Product  #
+  ########################
+  GetProductRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: appsync.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: GetProductTableAccess
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:Query
+                  - dynamodb:Scan
+                  - dynamodb:GetItem
+                  - dynamodb:BatchGetItem
+                Resource:
+                  - !Sub "arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${Application}-${Environment}-Product"
+                  - !Sub "arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${Application}-${Environment}-Product/index/byProductStatus"
+
+  ProductTableDataSource:
+    Type: AWS::AppSync::DataSource
+    Properties:
+      ApiId: !Ref ApiId
+      Name: ProductTable
+      Type: AMAZON_DYNAMODB
+      ServiceRoleArn: !GetAtt GetProductRole.Arn
+      DynamoDBConfig:
+        AwsRegion: !Ref AWS::Region
+        TableName: !Sub ${Application}-${Environment}-Product
+
+  listProductsResolver:
+    Type: AWS::AppSync::Resolver
+    Properties:
+      ApiId: !Ref ApiId
+      DataSourceName: !GetAtt ProductTableDataSource.Name
+      FieldName: listProducts
+      TypeName: Query
+      RequestMappingTemplate: |
+        {
+            "version" : "2017-02-28",
+            "operation" : "Scan"
+        }
+      ResponseMappingTemplate: |
+        #if( $ctx.error )
+          $util.error($ctx.error.message, $ctx.error.type)
+        #else
+          #if($context.identity.claims.containsKey("m_stores"))
+              #set($ctx.result.items = $ctx.result.data["${Application}-${Environment}-Product"])
+              $util.qr($ctx.result.remove("data"))
+              $util.toJson($ctx.result)
+          #else
+              $util.toJson($ctx.result)
+          #end
+        #end
+
+  GetProductResolver:
+    Type: AWS::AppSync::Resolver
+    Properties:
+      ApiId: !Ref ApiId
+      DataSourceName: !GetAtt ProductTableDataSource.Name
+      FieldName: getProduct
+      TypeName: Query
+      RequestMappingTemplate: |
+        {
+          "version": "2018-05-29",
+          "operation": "GetItem",
+          "key": #if( $modelObjectKey ) $util.toJson($modelObjectKey) #else {
+          "id": $util.dynamodb.toDynamoDBJson($ctx.args.id)
+        } #end
+        }
+      ResponseMappingTemplate: |
+        $util.toJson($ctx.result)
+
+  ########################
+  # Search Product  #
+  ########################
+  SearchProductFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: appsync.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: SearchProductFunctionAccess
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: lambda:InvokeFunction
+                Resource: !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${Application}-${Environment}-ProductSearch-Function
+
+  SearchProductDataSource:
+    Type: AWS::AppSync::DataSource
+    Properties:
+      ApiId: !Ref ApiId
+      Name: SearchProduct
+      Type: AMAZON_ELASTICSEARCH
+      ServiceRoleArn: !GetAtt SearchProductFunctionRole.Arn
+      ElasticsearchConfig:
+        AwsRegion: !Sub ${AWS::Region}
+        Endpoint: "https://search-spirits-dev-es-5rxmmgmdh4kmqjbrk566m2cmqq.us-east-1.es.amazonaws.com"
+
+  SearchProductsResolver:
+    Type: AWS::AppSync::Resolver
+    Properties:
+      ApiId: !Ref ApiId
+      DataSourceName: !GetAtt SearchProductDataSource.Name
+      FieldName: searchProducts
+      TypeName: Query
+      RequestMappingTemplate: |
+        #set( $indexPath = "/spirits-dev-product/doc/_search" )
+        #set( $nonKeywordFields = [] )
+        #if( $util.isNullOrEmpty($context.args.sort) )
+          #set( $sortDirection = "desc" )
+          #set( $sortField = "id" )
+        #else
+          #set( $sortDirection = $util.defaultIfNull($context.args.sort.direction, "desc") )
+          #set( $sortField = $util.defaultIfNull($context.args.sort.field, "id") )
+        #end
+        #if( $nonKeywordFields.contains($sortField) )
+          #set( $sortField0 = $util.toJson($sortField) )
+        #else
+          #set( $sortField0 = $util.toJson("${sortField}.keyword") )
+        #end
+        {
+          "version": "2018-05-29",
+          "operation": "GET",
+          "path": "$indexPath",
+          "params": {
+              "body":     {
+                        #if( $context.args.nextToken )"search_after": [$util.toJson($context.args.nextToken)], #end
+                        #if( $context.args.from )"from": $context.args.from, #end
+                        "size": #if( $context.args.limit ) $context.args.limit #else 100 #end,
+                        "sort": [{$sortField0: { "order" : $util.toJson($sortDirection) }}],
+                        "version": false,
+                        "query": #if( $context.args.filter )
+        $util.transform.toElasticsearchQueryDSL($ctx.args.filter)
+        ,
+        #else
+        {
+              "match_all": {}
+          }
+        ,
+        #end
+        "aggregations": {
+            "Country": {
+              "terms": {
+              "field": "country.keyword"
+              }
+            },
+            "Type": {
+              "terms": {
+              "field": "prodMajor.keyword"
+              }
+            },
+            "Container": {
+              "terms": {
+              "field": "container.keyword"
+              }
+            },
+            "Brand": {
+              "terms": {
+              "field": "brandLine.keyword"
+              }
+            },
+            "ProdCategory": {
+              "terms": {
+              "field": "prodCategory.keyword"
+              }
+            },
+            "ProdMajor": {
+              "terms": {
+              "field": "prodMajor.keyword"
+              }
+            },
+            "ProdMinor": {
+              "terms": {
+              "field": "prodMinor.keyword"
+              }
+            }
+            
+          }
+                        }
+          }
+        }
+
+      ResponseMappingTemplate: |
+        #set( $es_items = [] )
+        #foreach( $entry in $context.result.hits.hits )
+          #if( !$foreach.hasNext )
+            #set( $nextToken = $entry.sort.get(0) )
+          #end
+          $util.qr($es_items.add($entry.get("_source")))
+        #end
+        $util.toJson({
+          "items": $es_items,
+          "brand": $ctx.result.aggregations.Brand,
+          "majorType": $ctx.result.aggregations.Type,
+          "country": $ctx.result.aggregations.Country,
+          "container": $ctx.result.aggregations.Container,
+          "ProdCategory": $ctx.result.aggregations.ProdCategory,
+          "ProdMajor" : $ctx.result.aggregations.ProdMajor,
+          "ProdMinor" : $ctx.result.aggregations.ProdMinor,	
+          "total": $ctx.result.hits.total.value,
+          "nextToken": $nextToken
+        })
+  ##########################
+  # S3 Signed URL #
+  ##########################
+  SignedURLDataSource:
+    Type: AWS::AppSync::DataSource
+    Properties:
+      ApiId: !Ref ApiId
+      Name: SignedURLDataSource
+      Type: AWS_LAMBDA
+      ServiceRoleArn: !GetAtt SignedURLAppSyncRole.Arn
+      LambdaConfig:
+        LambdaFunctionArn: !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${Application}-${Environment}-S3SignedURL-Function
+
+  S3SignedURLResolver:
+    Type: AWS::AppSync::Resolver
+    Properties:
+      ApiId: !Ref ApiId
+      DataSourceName: !GetAtt SignedURLDataSource.Name
+      FieldName: getS3SignedURL
+      TypeName: Query
+      RequestMappingTemplate: !Sub |
+        {
+         "version" : "2018-05-29",
+         "operation": "Invoke",
+         "payload": {
+           "user": $util.toJson($context.identity.claims.get("cognito:username")),
+           "body": $util.toJson($context.arguments)
+           }
+         }
+
+      ResponseMappingTemplate: |
+        $utils.toJson($ctx.result)
+
+  SignedURLAppSyncRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: appsync.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: SignedURLFunctionAccess
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: lambda:InvokeFunction
+                Resource: !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${Application}-${Environment}-S3SignedURL-Function
+
+  ##########################
+  # S3 Signed URL Multiple#
+  ##########################
+  GetSignedURLsAppSyncRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: appsync.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: GetSignedURLsFunctionAccess
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: lambda:InvokeFunction
+                Resource: !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${Application}-${Environment}-GetSignedURLs-Function
+
+  MultiSignedURLsDataSource:
+    Type: AWS::AppSync::DataSource
+    Properties:
+      ApiId: !Ref ApiId
+      Name: MultiSignedURLsDataSource
+      Type: AWS_LAMBDA
+      ServiceRoleArn: !GetAtt GetSignedURLsAppSyncRole.Arn
+      LambdaConfig:
+        LambdaFunctionArn: !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${Application}-${Environment}-GetSignedURLs-Function
+
+  GetSignedURLsResolver:
+    Type: AWS::AppSync::Resolver
+    Properties:
+      ApiId: !Ref ApiId
+      DataSourceName: !GetAtt MultiSignedURLsDataSource.Name
+      FieldName: getMultipleSignedURL
+      TypeName: Query
+      RequestMappingTemplate: !Sub |
+        #if($context.identity.claims.containsKey("m_account"))
+          #set($accountId = $context.identity.claims.get("m_account"))
+        #else
+          #set($accountId = "NONE")
+        #end
+        #if($context.identity.claims.containsKey("m_group"))
+          #set($group = $context.identity.claims.get("m_group"))
+        #else
+          #set($group = "NONE")
+        #end
+        #set($username=$context.identity.claims.get("cognito:username"))
+        #if($accountId == $context.arguments.merchantAccountId && ( $group == "Merchant_Admin" ||  $group == "Merchant_Super_user" ))
+        ##
+         {
+          "version": "2018-05-29",
+            "operation": "Invoke",
+            "payload": {
+            "user": $util.toJson($username),
+            "body": $util.toJson($context.arguments)
+          }
+        }
+        #else
+            $utils.unauthorized()
+        #end
+      ResponseMappingTemplate: |
+        $utils.toJson($ctx.result)
