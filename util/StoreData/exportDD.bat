@@ -1,0 +1,1 @@
+aws dynamodb scan --table-name spirits-dev-Store --select ALL_ATTRIBUTES --page-size 500 --max-items 100000 --output json > storedump.json

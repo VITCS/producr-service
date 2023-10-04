@@ -1,0 +1,66 @@
+id,upc,prodCategory,prodMajor,prodFullName,size,uom,Price,Availability
+UA_018200079863,18200079863,Beer,Premium,Budweiser Select 12-Pack 12 FL OZ Bottle,144,FL OZ,9.49,200
+UA_018200110306,18200110306,Beer,Premium,Budweiser 30-Pack 12 FL OZ Can,360,FL OZ,19.49,200
+UA_018200110474,18200110474,Beer,Premium,Budweiser 12-Pack 12 FL OZ Can,144,FL OZ,9.49,200
+UA_018200111686,18200111686,Beer,Premium,Budweiser 24-Pack 12 FL OZ Can,288,FL OZ,16.49,200
+UA_018200112188,18200112188,Beer,Premium,Budweiser 18-Pack 12 FL OZ Can,216,FL OZ,13.99,200
+UA_018200113086,18200113086,Beer,Premium,Budweiser 18-Pack 12 FL OZ Bottle,216,FL OZ,13.99,200
+UA_018200113499,18200113499,Beer,Premium,Budweiser 24-Pack 12 FL OZ Bottle,288,FL OZ,16.49,200
+UA_034100572433,34100572433,Beer,Premium,Miller Lite 24-Pack 12 FL OZ Bottle,288,FL OZ,16.49,200
+UA_034100572563,34100572563,Beer,Premium,Miller Lite 18-Pack 12 FL OZ Bottle,216,FL OZ,13.99,200
+UA_034100573126,34100573126,Beer,Premium,Miller Lite 24-Pack 8 FL OZ Can,195,FL OZ,16.49,200
+UA_034100573409,34100573409,Beer,Premium,Miller Lite 18-Pack 12 FL OZ Can,216,FL OZ,13.99,200
+UA_034100573416,34100573416,Beer,Premium,Miller Lite 30-Pack 12 FL OZ Can,360,FL OZ,19.49,200
+UA_034100575052,34100575052,Beer,Premium,Miller Lite 6-Pack 12 FL OZ Bottle,72,FL OZ,5.29,200
+UA_034100575090,34100575090,Beer,Premium,Miller Lite 12-Pack 12 FL OZ Bottle,144,FL OZ,9.49,200
+UA_034100576325,34100576325,Beer,Premium,Miller Lite 12-Pack 10 FL OZ Can,120,FL OZ,9.49,200
+UA_011034500039,11034500039,Wine,Sparkling Wine,Martini & Rossi Sparkling Wine Moscato Blanco,1.5,LT,28.99,200
+UA_011034500053,11034500053,Wine,Sparkling Wine,Martini & Rossi Sparkling Wine Moscato Blanco,750,ML,14.99,200
+UA_011034500077,11034500077,Wine,Sparkling Wine,Martini & Rossi Sparkling Wine Moscato Blanco,375,ML,7.99,200
+UA_011034501005,11034501005,Wine,Sparkling Wine,Martini & Rossi Sparkling Wine Glera,750,ML,14.99,200
+UA_011034501012,11034501012,Wine,Sparkling Wine,Martini & Rossi Sparkling Wine Glera,187,ML,7.99,200
+UA_011034501029,11034501029,Wine,Sparkling Wine,Martini & Rossi Sparkling Wine Glera,748,ML,12.99,200
+UA_011034503801,11034503801,Wine,Sparkling Wine,Martini & Rossi Sparkling Wine Moscato Blanco,187,ML,7.99,200
+UA_011034503818,11034503818,Wine,Sparkling Wine,Martini & Rossi Sparkling Wine Moscato Blanco,187,ML,7.99,200
+UA_011034503825,11034503825,Wine,Rose Wine,Martini & Rossi Rose Wine Rose Blend,750,ML,13.99,200
+UA_011034503832,11034503832,Wine,Rose Wine,Martini & Rossi Spumante Rose Wine Rose Blend,187,ML,3.99,200
+UA_089744335852,89744335852,Wine,Red Wine,Chateau Saint-Sulpice Red Wine Red Bordeaux Blend,750,ML,14.99,200
+UA_098709088504,98709088504,Wine,Red Wine,Catena High Mountain Vines Red Wine Cabernet Sauvignon,750,ML,19.99,200
+UA_098709088535,98709088535,Wine,White Wine,Catena High Mountain Vines White Wine Chardonnay,750,ML,14.99,200
+UA_098709088580,98709088580,Wine,Red Wine,Catena High Mountain Vines Red Wine Malbec,750,ML,19.99,200
+UA_098709088603,98709088603,Wine,Red Wine,Catena Alta Historic Rows Red Wine Malbec,750,ML,24.99,200
+UA_080480000127,80480000127,Liquor,Whiskey,Dewar's Double Aged Blended Scotch Whisky 18 Year,750,ML,76.99,200
+UA_080480005221,80480005221,Liquor,Whiskey,Dewar's The Monarch Blended Scotch Whisky 15 Year,750,ML,42.99,200
+UA_080480005245,80480005245,Liquor,Rum,Bacardi Black Rum,1.75,LT,29.99,200
+UA_080480005252,80480005252,Liquor,Rum,Bacardi Black Rum,1,LT,19.99,200
+UA_080480005269,80480005269,Liquor,Rum,Bacardi Black Rum,750,ML,15.39,200
+UA_080480005276,80480005276,Liquor,Rum,Bacardi Black Rum,375,ML,7.99,200
+UA_080480005283,80480005283,Liquor,Rum,Bacardi Black Rum,200,ML,5.49,200
+UA_080480015206,80480015206,Liquor,Rum,Bacardi Superior Light Rum,1.75,LT,29.99,200
+UA_080480015305,80480015305,Liquor,Rum,Bacardi Superior Light Rum,1,LT,19.99,200
+UA_080480015329,80480015329,Liquor,Rum,Bacardi Superior Light Rum,1.75,LT,29.99,200
+UA_080480015404,80480015404,Liquor,Rum,Bacardi Superior Light Rum,750,ML,15.39,200
+UA_080480015459,80480015459,Liquor,Rum,Bacardi Superior Light Rum - Traveler,750,ML,15.39,200
+UA_080480015602,80480015602,Liquor,Rum,Bacardi Superior Light Rum,375,ML,7.99,200
+UA_080480015701,80480015701,Liquor,Rum,Bacardi Superior Light Rum,200,ML,5.49,200
+UA_080480015800,80480015800,Liquor,Rum,Bacardi Superior Light Rum,100,ML,3.99,200
+UA_080480016210,80480016210,Liquor,Rum,Bacardi Superior Light Rum,50,ML,2.99,200
+UA_080480230005,80480230005,Liquor,Whiskey,Dewar's White Label Blended Scotch Whisky,1.75,LT,39.98,200
+UA_080480230012,80480230012,Liquor,Whiskey,Dewar's White Label Blended Scotch Whisky,1,LT,33.99,200
+UA_080480231002,80480231002,Liquor,Whiskey,Dewar's Blended Scotch Whisky Special Reserve 12 Year,1.75,LT,49.99,200
+UA_080480231019,80480231019,Liquor,Whiskey,Dewar's Blended Scotch Whisky Special Reserve 12 Year,750,ML,32.99,200
+UA_080480280000,80480280000,Liquor,Vodka,Grey Goose Vodka,1.75,LT,17.99,200
+UA_080480280017,80480280017,Liquor,Vodka,Grey Goose Vodka,1,LT,13.99,200
+UA_080480280024,80480280024,Liquor,Vodka,Grey Goose Vodka,750,ML,10.99,200
+UA_080480280031,80480280031,Liquor,Vodka,Grey Goose Vodka,375,ML,7.99,200
+UA_080480280048,80480280048,Liquor,Vodka,Grey Goose Vodka,200,ML,5.49,200
+UA_080480280055,80480280055,Liquor,Vodka,Grey Goose Vodka,50,ML,2.99,200
+UA_080480984403,80480984403,Liquor,Whiskey,Dewar's Double Double Blended Scotch Whisky 21 Year,375,ML,55.31,200
+UA_080480984410,80480984410,Liquor,Whiskey,Dewar's Double Double Blended Scotch Whisky 27 Year,375,ML,109.99,200
+UA_080480984427,80480984427,Liquor,Whiskey,Dewar's Double Double Blended Scotch Whisky 32 Year,375,ML,169.99,200
+UA_087116014633,87116014633,Liquor,Vodka,UV Vodka,1.75,LT,17.99,200
+UA_087116014657,87116014657,Liquor,Vodka,UV Vodka,1,LT,13.99,200
+UA_087116014664,87116014664,Liquor,Vodka,UV Vodka,375,ML,7.99,200
+UA_087116014671,87116014671,Liquor,Vodka,UV Vodka,750,ML,10.99,200
+UA_087116014701,87116014701,Liquor,Vodka,UV Vodka,50,ML,2.99,200
+UA_087116014749,87116014749,Liquor,Vodka,UV Vodka,200,ML,5.49,200

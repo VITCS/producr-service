@@ -1,0 +1,83 @@
+{
+  "merchantAccountId": "5135278955702092",
+  "businessHours": {
+    "Thu": [
+      "10 AM",
+      "6 PM"
+    ],
+    "Tue": [
+      "10 AM",
+      "6 PM"
+    ],
+    "Wed": [
+      "10 AM",
+      "6 PM"
+    ],
+    "Sat": [
+      "10 AM",
+      "6 PM"
+    ],
+    "Fri": [
+      "10 AM",
+      "6 PM"
+    ],
+    "Mon": [
+      "10 AM",
+      "6 PM"
+    ],
+    "Sun": [
+      "10 AM",
+      "6 PM"
+    ]
+  },
+  "carriersAllowed": [],
+  "specialProdCat": [],
+  "storePhoneNumber": "+1 1111111111",
+  "storeStatus": "NEW",
+  "createdAt": "2021-11-14T15:00:43.872Z",
+  "giftWrapping": [],
+  "statusReason": "",
+  "holidays": [],
+  "userCount": 0.0,
+  "createdBy": "sri001",
+  "deliveryHours": {
+    "Thu": [
+      "11 AM",
+      "6 PM"
+    ],
+    "Tue": [
+      "11 AM",
+      "6 PM"
+    ],
+    "Wed": [
+      "11 AM",
+      "6 PM"
+    ],
+    "Sat": [
+      "11 AM",
+      "6 PM"
+    ],
+    "Fri": [
+      "11 AM",
+      "6 PM"
+    ],
+    "Mon": [
+      "11 AM",
+      "6 PM"
+    ],
+    "Sun": [
+      "11 AM",
+      "6 PM"
+    ]
+  },
+  "orderFulfilling": {
+    "gifting": "Personal",
+    "delivery": [
+      "Delivery_Local"
+    ],
+    "pickUp": [
+      "Not_available"
+    ]
+  },
+  "storeEmail": ""
+}

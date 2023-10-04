@@ -1,0 +1,18 @@
+{
+"storeName" : "SUNOCO SERVICE STATION",
+"address" : {
+"country" : "United States",
+"city" : "Cedarville",
+"addrLine2" : "",
+"addrLine1" : "56 Maple Ave",
+"latitude" : 39.33435,
+"postCode" : "08311-2415",
+"state" : "New Jersey",
+"geoPoint" : {
+  "lon" : -75.19668,
+  "lat" : 39.33435
+},
+"longitude" : -75.19668
+},
+"storeRefId" : "2",
+}
